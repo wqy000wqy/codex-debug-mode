@@ -1,0 +1,30 @@
+import {fileURLToPath} from 'node:url';import assert from 'node:assert/strict';import {mkdtemp,readFile} from 'node:fs/promises';import {Client} from '@modelcontextprotocol/sdk/client/index.js';import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';import {randomUUID} from 'node:crypto';import {execFileSync} from 'node:child_process';
+const dir=await mkdtemp('/private/tmp/debug-mode-080-mcp-'),clients=[];
+async function connect(){const c=new Client({name:'regression',version:'1'});await c.connect(new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))],env:{...process.env,CODEX_DEBUG_DATA_DIR:dir}}));clients.push(c);return c;}
+const call=async(c,name,args)=>{const r=await c.callTool({name,arguments:args});if(r.isError)throw Error(JSON.stringify(r.content));return r;};
+try{const a=await connect();const result=await call(a,'debug_start',{issue:'检查',hypotheses:['A','B','C'],reproductionSteps:['run']});const state=result.structuredContent;const args={sessionId:state.sessionId};
+const preflight=await fetch(state.telemetry.receiverUrl,{method:'OPTIONS',headers:{origin:'http://localhost:3000','access-control-request-method':'POST','access-control-request-headers':'content-type,x-debug-token','access-control-request-private-network':'true'}});assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-private-network'),'true');
+const denied=await fetch(state.telemetry.receiverUrl,{method:'POST',headers:{'content-type':'application/json','x-debug-token':'invalid'},body:'{}'});assert.equal(denied.status,401);
+await call(a,'debug_show_card',args);const b=await connect();const actionId=randomUUID();const pair=await Promise.all([call(a,'debug_proceed',{...args,actionId}),call(b,'debug_proceed',{...args,actionId})]);assert.equal(pair[0].structuredContent.revision,pair[1].structuredContent.revision);await call(b,'debug_resume',{...args,actionId:randomUUID(),interrupted:true,expectedRevision:pair[0].structuredContent.revision});
+ const append=()=>fetch(state.telemetry.receiverUrl,{method:'POST',headers:{'content-type':'application/json','x-debug-token':state.telemetry.token},body:JSON.stringify({message:'event',path:'/api/check?test=redacted',hypothesisId:'A',data:{branch:true}})});assert.equal((await append()).status,201);
+ await call(a,'debug_prepare_round',{...args,actionId:randomUUID(),expectedRound:1,hypotheses:['A','B','C'],reproductionSteps:['again'],purpose:'verification',baselineRound:1,nextRound:true});const after=await append();assert.equal(after.status,201);assert.equal((await after.json()).round,2);
+ const archive=await call(a,'debug_get_round',{...args,round:1});assert.equal(JSON.parse(archive.content[0].text).totalCount,1);
+ const snap=(await call(a,'debug_get_logs',args)).structuredContent;assert.equal(snap.logCount,1);assert.equal(snap.logs[0].round,2);assert.equal(snap.logs[0].path,'/api/check');assert(!JSON.stringify(snap.logs).includes('test='));
+ assert.equal(snap.workflow.purpose,'verification');assert.equal(snap.workflow.baselineRound,1);
+ const analysis=await call(a,'debug_proceed',args);assert.match(analysis.structuredContent.workflow.instruction,/baselineRound/);
+ const confirm=await call(a,'debug_await_confirmation',{...args,evidenceSummary:'对照第1轮与第2轮事件'});
+ assert.equal(confirm.structuredContent.status,'awaiting_confirmation');
+ assert.equal(confirm.structuredContent.round,2);
+ assert.match(confirm.content[0].text,/等待用户确认/);
+ const reopened=await call(a,'debug_show_card',args);assert.equal(reopened.structuredContent.status,'awaiting_confirmation');
+ const fixed=await call(b,'debug_mark_fixed',args);assert.match(fixed.content[0].text,/各轮/);assert.match(fixed.structuredContent.workflow.instruction,/不要额外复现/);
+ const finished=await call(b,'debug_finish_cleanup',args);assert.equal(finished.structuredContent.status,'fixed');
+ const list=await a.listTools();assert(list.tools.some(t=>t.name==='debug_await_confirmation'));for(const name of ['debug_prepare_round','debug_await_confirmation'])assert.equal(list.tools.find(t=>t.name===name)._meta.ui.resourceUri,'ui://debug-mode/debug-card.html');assert.match(list.tools.find(t=>t.name==='debug_proceed').description,/不代表已成功复现/);
+ const extra=(await call(a,'debug_start',{issue:'仅移除埋点，不代表解决',hypotheses:['A','B','C'],reproductionSteps:['运行']})).structuredContent;
+ const extraArgs={sessionId:extra.sessionId};await call(a,'debug_show_card',extraArgs);
+ const removal=await call(a,'debug_request_cleanup',{...extraArgs,endSession:false});assert.equal(removal.structuredContent.workflow.cleanupReason,'instrumentation_removal');
+ const removed=await call(a,'debug_finish_cleanup',extraArgs);assert.equal(removed.structuredContent.status,'waiting');assert.equal(removed.structuredContent.workflow.instrumentationRemovedByRequest,true);
+ await call(a,'debug_request_cleanup',{...extraArgs,endSession:true});const ended=await call(a,'debug_finish_cleanup',extraArgs);assert.equal(ended.structuredContent.status,'closed');
+ const resources=await a.listResources();const html=await a.readResource({uri:resources.resources[0].uri});assert(html.contents[0].text.includes('class DebugClient'));assert(!html.contents[0].text.includes('/* CLIENT_STATE */'));assert(html.contents[0].text.includes('ui/notifications/host-context-changed'));
+ console.log('PASS real MCP: discovery, two processes, same-action idempotency, baseline isolation, phase prompts, wait-confirmation without new round, reopen, confirmed cleanup, removal-only cleanup, unresolved close and embedded UI');
+}catch(e){console.error(e);process.exitCode=1;}finally{for(const c of clients)await c.close();try{const cfg=JSON.parse(await readFile(dir+'/receiver.json','utf8'));const pids=execFileSync('/usr/sbin/lsof',['-t','-iTCP:'+cfg.port,'-sTCP:LISTEN'],{encoding:'utf8'}).trim().split('\n');for(const pid of pids)if(pid)process.kill(Number(pid),'SIGTERM');}catch{}}

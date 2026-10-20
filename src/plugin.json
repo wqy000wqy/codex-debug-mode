@@ -1,0 +1,39 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "debug-mode",
+  "description": "Debug Mode 本机调试工作流：分析根因假设、添加临时埋点、复现问题并查看日志。",
+  "author": {
+    "name": "wqy000wqy"
+  },
+  "keywords": [
+    "debugging",
+    "mcp",
+    "mcp-app"
+  ],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "Debug Mode",
+        "shortDescription": "提出假设、插入埋点、采集日志并定位根因",
+        "longDescription": "Codex 本机调试工作流。先分析并布置埋点，再只在 fullscreen 标签页显示调试面板；继续分析时按日志证据迭代修复，标记为已修复后清理临时调试改动并保留有效修复。",
+        "developerName": "wqy000wqy",
+        "category": "开发工具",
+        "capabilities": [
+          "Interactive",
+          "Read",
+          "Write"
+        ],
+        "defaultPrompt": [
+          "请使用 Debug Mode 排查这个问题。先提出根因假设、取得有效日志配置并添加必要埋点，再在 fullscreen 标签页交接复现；根据运行日志迭代修复，用户确认后只清理临时诊断改动并保留有效修复和变更。"
+        ],
+        "brandColor": "#E54870",
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/icon.svg"
+      }
+    }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/wqy000wqy/codex-debug-mode",
+  "repository": "https://github.com/wqy000wqy/codex-debug-mode.git"
+}

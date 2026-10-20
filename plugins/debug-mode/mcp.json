@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "debug-mode": {
+      "type": "stdio",
+      "command": "/bin/sh",
+      "args": [
+        "${PLUGIN_ROOT}/runtime/launch.sh"
+      ],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}

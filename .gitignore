@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.env.*
+coverage/
+artifacts/
+plugins/.*.build-*/
+plugins/.*.previous-*/
+# Generated plugins/ is intentionally tracked so Git marketplace installs need no npm ci.
