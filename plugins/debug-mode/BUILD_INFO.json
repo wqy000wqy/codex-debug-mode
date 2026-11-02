@@ -1,5 +1,5 @@
 {
-  "version": "0.9.0",
+  "version": "0.9.1",
   "nodeTarget": "node22",
   "dependencies": [
     {
@@ -49,17 +49,17 @@
     }
   ],
   "sha256": {
-    ".codex-plugin/plugin.json": "5cffbd0da1bbde96be096c79e0b9367f9b9d22af6a2cb001dc8a8d9b4083db87",
-    ".mcp.json": "6a6254aa934bca6e870af46fc1b7495d1504f5b344c8b174776b9a97704199e1",
+    ".codex-plugin/plugin.json": "7c5ba00d69129cfc3553c7358d382c27f74624c16ed03ad8046623762715d596",
+    ".mcp.json": "480376b6be0d7aaa16ec1c59932ffc4591d60834929f49ff53cb7adeaeee718d",
     "LICENSE": "e42e50c9812b178e9dace7bfe1c3108beb22d464e4bc8f837f320cbaefae36df",
     "THIRD_PARTY_NOTICES.md": "3934c5e05ca8410d0841a92e927ff532dc7019b0f17741d8483be1372e125ff3",
     "assets/icon.svg": "e7a6dd44c211c52e69e1ce662f39eb1444477c82f268190bd95c0269c26d0364",
-    "mcp.json": "0f920409e4cda7e207f7ca088b6707cb18fb6877c25961241a27a0f9fdd5bc5b",
-    "package.json": "e33295e7511a26484dd6b81268e5db983cb1ec3f802c81c44c72d11b6c9108bc",
-    "plugin.json": "e312ea41cda2ea76315ad474489d6a7b64adc9980149235006679f081b16d4a8",
+    "mcp.json": "6d6b4f43b43b6f96463fad54acf65284ecb0d95f2ba3f4865c0e5b8b6cbff1aa",
+    "package.json": "6708b3d7e186ed586ef0e9a089634f64be10be39568b3c6a6eeeda0120a6b98d",
+    "plugin.json": "f2e571e3d095e268c8d198ea0917299fc7a92b20834c44661b6ee2a5744c5756",
     "runtime/assets/debug-card.html": "14eb4365913e16a8467ceff4bb8f7a328e85bec59c5dc3f4e5617edeced1e23f",
     "runtime/client-state.mjs": "c95f36808dc9ef1fd104eb98511a73c0ca35cab07373abd6082e880f0d5c2510",
-    "runtime/launch.sh": "f2d9edad129fec5a2c5686aaba18f428768718376c90cae9faffde8687103439",
+    "runtime/launch.sh": "af45d012c49b74e5254235cd0624d0b9d9007e0f827a5702ba5febcd58af412a",
     "runtime/receiver.mjs": "c85695d47a8d17bb653ec6896670ee622d02beae4b31f478ed616e294ed8bba7",
     "runtime/server.mjs": "b4fd6aae541eebb3c708cbeb37410760e348689048f8547e1a1fe8e4f5272862",
     "runtime/view.mjs": "6947c6db6dab5e2936805c1627e13588a33fac726e708487f07212c1d9dbbceb",

@@ -8,7 +8,7 @@
 
 ## 安装
 
-需要支持本地插件和 MCP Apps 的 Codex 桌面版本，以及可用的 Node.js 22+（或宿主提供的兼容运行时）。当前分发启动器面向 macOS；Linux 尚未验证，Windows 不支持此启动脚本。
+需要支持本地插件和 MCP Apps 的 Codex 桌面版本，以及 Node.js 22+。当前分发启动器面向 macOS；Linux 尚未验证，Windows 不支持此启动脚本。启动器会检查 PATH、nvmd、nvm、fnm、Volta、mise、asdf 及常见 macOS 包管理器路径，不会在安装时下载或安装 Node。
 
 在终端注册此 Git 插件市场：
 
@@ -23,6 +23,13 @@ https://github.com/wqy000wqy/codex-debug-mode
 ```
 
 安装者不需要运行 npm install 或构建；仓库中的 `plugins/debug-mode/` 已包含打包后的依赖。若原型“调试模式 MVP”仍启用，建议先禁用原型，避免两套技能和工具同时出现。
+
+这个 MCP 是随插件加载的**插件级服务**，不会单独登记到全局 MCP 列表；因此 `codex mcp list` 看不到 `debug-mode` 是正常的。请在插件页确认 Debug Mode 已安装且启用，再新建会话使用。插件服务器也可以在 Codex 的插件配置中单独启用或禁用；若曾被显式禁用，可在 `~/.codex/config.toml` 添加：
+
+```toml
+[plugins."debug-mode@codex-debug-mode".mcp_servers.debug-mode]
+enabled = true
+```
 
 也可以克隆仓库后运行 `./install-local.command` 注册本地市场。这个脚本只调用 Codex CLI 注册市场；已有配置会先备份，不会安装 Node、npm 或 Homebrew。
 

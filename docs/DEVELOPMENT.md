@@ -40,9 +40,19 @@ npm run test:mcp
 
 ### 无法启动本机服务
 
-启动器依次查找用户指定的 `CODEX_DEBUG_NODE_PATH`、宿主提供的 `CODEX_MCP_NODE_PATH`、PATH 中的 node，以及常见 macOS 安装路径。需要可执行的 Node.js 22+。
+MCP 使用插件内的相对启动命令 `./runtime/launch.sh`。Agent Plugins 规范要求 stdio 命令是一个可执行名称或插件相对路径；不要用 `/bin/sh` 这样的绝对命令。Codex 应从插件自己的 `mcp.json` 加载服务器；它不应该出现在全局 `codex mcp list` 中。
 
-用户指定 CODEX_DEBUG_NODE_PATH 后，该选择具有优先权；无效时会报错，不会偷偷切换。若桌面应用未继承终端环境，请通过宿主支持的 MCP 环境配置指定运行时，或让兼容 node 出现在桌面应用可见的 PATH 中。启动器不下载工具链。
+启动器依次检查 `CODEX_DEBUG_NODE_PATH`（若宿主进程传入）、PATH、nvmd、nvm、fnm、Volta、mise、asdf，以及常见 macOS Homebrew/MacPorts 路径。任何找到的 Node 版本必须是 22+。自定义路径变量若存在但无效，会明确报错，不会悄悄改用另一个 Node。
+
+克隆仓库后可以手动检查本机终端能发现的运行时：
+
+```sh
+./plugins/debug-mode/runtime/launch.sh --check
+```
+
+此检查通过不保证 Codex GUI 使用完全相同的环境；若 GUI 启动时仍找不到自定义路径，需确保其 MCP 子进程可以读取 `CODEX_DEBUG_NODE_PATH`，或将 node 安装在启动器支持的常见路径。启动器不下载工具链。
+
+如果插件技能已加载但工具不可用，先检查 Debug Mode 插件是否启用，再查看该插件的 MCP 服务器开关是否被设成禁用；对话中已加载的工具清单不会在安装后自动刷新，请新开会话。
 
 ### 已复现但日志为 0
 

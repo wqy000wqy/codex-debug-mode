@@ -23,8 +23,8 @@ assert.equal(await readFile(join(root,'src/skills/debug-mode/SKILL.md'),'utf8'),
 const mcp=await readJson(join(payload,'mcp.json'));
 assert.equal(mcp.$schema,'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json');
 assert.deepEqual(Object.keys(mcp.mcpServers),['debug-mode']);
-assert.equal(mcp.mcpServers['debug-mode'].command,'/bin/sh');
-assert.equal(mcp.mcpServers['debug-mode'].args[0],'${PLUGIN_ROOT}/runtime/launch.sh');
+assert.equal(mcp.mcpServers['debug-mode'].command,'./runtime/launch.sh');
+assert.equal(mcp.mcpServers['debug-mode'].cwd,'${PLUGIN_ROOT}');
 const marketplace=await readJson(join(root,'.agents/plugins/marketplace.json'));
 assert.equal(marketplace.plugins.length,1);assert.equal(marketplace.plugins[0].name,manifest.name);
 assert.equal(resolve(root,marketplace.plugins[0].source.path),payload);
@@ -46,4 +46,7 @@ assert.equal(count,allow.size);
 for(const [path,hash]of Object.entries(info.sha256))assert(allow.has(path)&&/^[a-f0-9]{64}$/.test(hash),'Unexpected build hash entry');
 assert((await readFile(join(payload,'runtime/server.mjs'),'utf8')).includes('debug_await_confirmation'));
 assert((await readFile(join(payload,'runtime/server.mjs'),'utf8')).includes('debug_request_cleanup'));
+assert((await readFile(join(payload,'runtime/launch.sh'),'utf8')).includes('.nvm/versions/node/*/bin/node'));
+assert((await readFile(join(payload,'runtime/launch.sh'),'utf8')).includes('.nvmd/versions/*/bin/node'));
+assert((await lstat(join(payload,'runtime/launch.sh'))).mode & 0o111,'Launcher must be executable');
 console.log(`Static package checks passed: ${count} files, version ${pkg.version}, bundled runtime, manifests, workflow, licenses and hashes.`);

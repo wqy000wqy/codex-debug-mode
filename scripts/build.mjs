@@ -25,12 +25,12 @@ try {
  await json(join(tmp,'plugin.json'),manifest);
  await cp(join(root,'LICENSE'),join(tmp,'LICENSE'));
  await json(join(tmp,'package.json'),{name,version:pkg.version,private:true,type:'module',engines:{node:'>=22'}});
- const server={type:'stdio',command:'/bin/sh',args:['${PLUGIN_ROOT}/runtime/launch.sh'],cwd:'${PLUGIN_ROOT}'};
+ const server={type:'stdio',command:'./runtime/launch.sh',cwd:'${PLUGIN_ROOT}'};
  await json(join(tmp,'mcp.json'),{$schema:'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',mcpServers:{'debug-mode':server}});
  await mkdir(join(tmp,'.codex-plugin'));
  const interfaceMeta=manifest.extensions['com.openai'].interface;
  await json(join(tmp,'.codex-plugin/plugin.json'),{name,version:pkg.version,description:manifest.description,author:manifest.author,keywords:manifest.keywords,requires_local_executor:true,skills:'./skills/',mcpServers:'./.mcp.json',interface:interfaceMeta});
- await json(join(tmp,'.mcp.json'),{mcpServers:{'debug-mode':{command:'/bin/sh',args:['./runtime/launch.sh'],cwd:'.',env_vars:['PATH','CODEX_MCP_NODE_PATH','CODEX_DEBUG_NODE_PATH'],tool_timeout_sec:120}}});
+ await json(join(tmp,'.mcp.json'),{mcpServers:{'debug-mode':{command:'./runtime/launch.sh',cwd:'.',env_vars:['PATH','CODEX_DEBUG_NODE_PATH'],tool_timeout_sec:120}}});
  // Retain license texts for packages actually included by the bundler.
  const packageDirs=new Set();
  for(const input of Object.keys(result.metafile.inputs)){

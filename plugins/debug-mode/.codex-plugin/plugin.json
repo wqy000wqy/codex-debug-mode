@@ -1,6 +1,6 @@
 {
   "name": "debug-mode",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Debug Mode 本机调试工作流：分析根因假设、添加临时埋点、复现问题并查看日志。",
   "author": {
     "name": "wqy000wqy"

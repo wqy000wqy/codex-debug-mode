@@ -12,4 +12,4 @@ if [ -f "$config_dir/config.toml" ] && [ ! -e "$config_dir/config.toml.before-de
   chmod 600 "$config_dir/config.toml.before-debug-mode.bak"
 fi
 codex plugin marketplace add "$repo_dir"
-printf '%s\n' '插件市场已注册。请在桌面插件页找到 Debug Mode 并安装/启用。'
+printf '%s\n' '插件市场已注册。请在桌面插件页找到 Debug Mode 并安装/启用。' '其 MCP 服务按插件加载，不会作为全局服务出现在 codex mcp list 中。安装或启用后请新开会话。'

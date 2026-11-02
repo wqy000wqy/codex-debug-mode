@@ -1,5 +1,11 @@
 # 更新记录
 
+## 0.9.1
+
+- 使用符合 Agent Plugins 规范的插件相对 MCP 启动命令，避免 Codex 跳过绝对路径命令。
+- 启动器增加 nvm、fnm、Volta、mise、asdf 等 Node.js 安装路径探测和运行时诊断模式。
+- 说明打包 MCP 是插件级连接，不会登记到全局 `codex mcp list`。
+
 ## 0.9.0
 
 - 首个可通过 Git 插件市场分发的团队版本。
